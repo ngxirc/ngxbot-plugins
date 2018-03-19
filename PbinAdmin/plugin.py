@@ -36,6 +36,8 @@ from supybot.commands import *
 import supybot.plugins as plugins
 import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
+import supybot.ircdb as ircdb
+import supybot.world as world
 try:
     from supybot.i18n import PluginInternationalization
     _ = PluginInternationalization('PbinAdmin')
