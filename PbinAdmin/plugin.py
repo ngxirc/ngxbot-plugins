@@ -45,55 +45,95 @@ except ImportError:
     _ = lambda x: x
 
 
+def capab(prefix):
+    if world.testing:
+        # we're running a testcase, always return True
+        return True
+    # Check capability #
+    try:
+        user = ircdb.users.getUser(prefix)
+    except KeyError:
+        return False
+    if 'pbinadmin' in list(user.capabilities):
+        return True
+    elif 'admin' in list(user.capabilities):
+        return True
+    return False
+
+
 class PbinAdmin(callbacks.Plugin):
-    """Provide administrative control over wiki to authorized users."""
+    '''Provide administrative control over wiki to authorized users.'''
     threaded = True
     def __init__(self, irc):
         self.__parent = super(PbinAdmin, self)
+        self.__parent.__init__(irc)
 
-    def whitelist(self, irc, msg, args, name):
-        '''Add a registered subnet to whitelist for specified IP address.'''
-        if not capab(msg.prefix, 'pbinadmin'):
+    def whitelist(self, irc, msg, args, channel, address):
+        '''[<channel>] <address>
+
+        Add a registered subnet to whitelist for specified IP address.'''
+        return self._cmd_wrapper(irc, msg, args, address, 'wl')
+
+    def greylist(self, irc, msg, args, channel, paste_id):
+        '''[<channel>] <paste_id>
+
+        Add address for specified paste to grey list.'''
+        return self._cmd_wrapper(irc, msg, args, paste_id, 'gl')
+
+    def blacklist(self, irc, msg, args, channel, paste_id):
+        '''[<channel>] <paste_id>
+
+        Add address for specified paste to black list.'''
+        return self._cmd_wrapper(irc, msg, args, paste_id, 'bl')
+
+    def delete(self, irc, msg, args, channel, paste_id):
+        '''[<channel>] <paste_id>
+
+        Delete a paste with specified ID.'''
+        return self._cmd_wrapper(irc, msg, args, paste_id, 'del')
+
+    def _cmd_wrapper(self, irc, msg, args, tgt, cmd):
+        '''A simple wrapper to eliminate repetition.'''
+        if not self.registryValue('enabled', msg.args[0]):
             return
-        (success, message) =  _run_cmd('wl', addr)
-
-    def greylist(self, irc, msg, args, name):
-        '''Add address for specified paste to grey list.'''
-        if not capab(msg.prefix, 'pbinadmin'):
+        if not capab(msg.prefix):
             return
-        (success, message) =  _run_cmd('gl', paste)
-
-    def blacklist(self, irc, msg, args, name):
-        '''Add address for specified paste to black list.'''
-        if not capab(msg.prefix, 'pbinadmin'):
+        if ' ' in tgt:
             return
-        (success, message) =  _run_cmd('bl', paste)
+        (success, message) =  self._run_cmd(msg, cmd, tgt)
+        irc.reply(message)
 
-    def delete(self, irc, msg, args, name):
-        '''Delete a paste with spefied ID.'''
-        if not capab(msg.prefix, 'pbinadmin'):
-            return
-        (success, message) =  _run_cmd('del', addr)
-
-    def _run_cmd(self, command, target):
+    def _run_cmd(self, msg, command, target):
         try:
-            # TODO: conf.get is an incorrect placeholder
-            resp = requests.post(conf.get('api_url'), data = {
-                    'token': conf.get('api_token'),
+            resp = requests.post(
+                self.registryValue('api_host', msg.args[0]),
+                json = {
+                    'token': self.registryValue('api_token', msg.args[0]),
                     'command': command,
-                    'target': target})
+                    'target': target},
+                headers = {'Content-type': 'application/json'})
         except:
             return (False, 'Error during API request.')
         if not resp:
             return (False, 'No response data from API request.')
+        if resp.status_code != 200:
+            return (False, 'Unexpected status code received: {}'.format(resp.status_code))
 
         rdata = resp.json()
+        if not rdata:
+            return (False, 'No data decoded.')
         status = rdata.get('status', '')
+
         if status == 'success':
             return (True, rdata['message'])
         elif status == 'error':
             return (False, rdata['message'])
-        return (False, 'Unexpected response from API server received.')
+        return (False, 'Unexpected status in server response.')
+
+    whitelist = wrap(whitelist, [optional('channel'), 'text'])
+    greylist = wrap(greylist, [optional('channel'), 'text'])
+    blacklist = wrap(blacklist, [optional('channel'), 'text'])
+    delete = wrap(delete, [optional('channel'), 'text'])
 
 
 Class = PbinAdmin

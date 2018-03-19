@@ -49,8 +49,9 @@ def configure(advanced):
 
 PbinAdmin = conf.registerPlugin('PbinAdmin')
 
+conf.registerChannelValue(PbinAdmin, 'enabled',
+    registry.Boolean(False, _('''Whether or not to enable PbinAdmin for the channel.''')))
 conf.registerChannelValue(PbinAdmin, 'api_token',
-    registry.String('', _('''API Token''')), private=True)
-
+    registry.String('', _('''Authorization Token used to contact API.''')))
 conf.registerChannelValue(PbinAdmin, 'api_host',
-    registry.String('https://paste.ngx.cc/admin', _('''Full API URL to query.''')))
+    registry.String('https://pbin.domain.tld/admin', _('''Full API URL to query.''')))
