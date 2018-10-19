@@ -76,7 +76,7 @@ class UnregNotify(callbacks.Plugin):
             return
 
         if account == '*':
-            irc.queueMsg(ircmsgs.privmsg(nick,
+            irc.queueMsg(ircmsgs.notice(nick,
                     'You joined {}, but you are not identified to services and cannot speak.'
                     ' For help with identification, type "/msg nickserv help register"'.format(channel)))
 
