@@ -38,6 +38,7 @@ from imp import reload
 
 import supybot
 import supybot.world as world
+import importlib
 
 __version__ = "ec9098d"
 
@@ -50,12 +51,12 @@ __contributors__ = {}
 # This is a url where the most recent plugin package can be downloaded.
 __url__ = 'https://github.com/leamas/supybot-irccat'
 
-import config
-import plugin
-reload(plugin)    # In case we're being reloaded.
+from . import config
+from . import plugin
+importlib.reload(plugin)    # In case we're being reloaded.
 
 if world.testing:
-    import test
+    from . import test
 
 Class = plugin.Class
 configure = config.configure
