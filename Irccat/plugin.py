@@ -140,7 +140,7 @@ class _Config(object):
         self.privmsg = config.global_option('privmsg').value
         self._path = config.global_option('sectionspath').value
         try:
-            self._data = json.load(open(self._path, 'rb'))
+            self._data = json.load(open(self._path, 'r'))
         except IOError:
             self._data = {}
             logger = log.getPluginLogger('irccat.config')
@@ -155,7 +155,7 @@ class _Config(object):
 
     def _dump(self):
         ''' Update persistent data.'''
-        json.dump(self._data, open(self._path, 'wb'))
+        json.dump(self._data, open(self._path, 'w'))
 
     def get(self, section_name):
         ''' Return (password, channels) tuple or raise KeyError. '''
