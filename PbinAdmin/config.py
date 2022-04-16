@@ -52,6 +52,7 @@ PbinAdmin = conf.registerPlugin('PbinAdmin')
 conf.registerChannelValue(PbinAdmin, 'enabled',
     registry.Boolean(False, _('''Whether or not to enable PbinAdmin for the channel.''')))
 conf.registerChannelValue(PbinAdmin, 'api_token',
-    registry.String('', _('''Authorization Token used to contact API.''')))
+    registry.String('', _('''Authorization Token used to contact API.'''),
+                    private=True))
 conf.registerChannelValue(PbinAdmin, 'api_host',
     registry.String('https://pbin.domain.tld/admin', _('''Full API URL to query.''')))
