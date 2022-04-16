@@ -1,5 +1,12 @@
 Supybot Irccat Plugin
 =====================
+
+Note: This is a modified version of Irccat. Changes include:
+
+- Update to py3
+- Use (u)json instead of pickle
+- Miscellaneous cleanup
+
 This is a plugin for the IRC bot Supybot that introduces the ability to
 listen to a TCP port and relay incoming text to one or more IRC channels,
 using some primitive security mechanisms.
@@ -19,12 +26,15 @@ running subybot with irccat
 
 Dependencies
 ------------
-- python-twisted (tested with 12.1)
+
+- python3-twisted (tested with 12.1)
 - supybot (tested with 0.83.4)
 - ncat for unit tests
+- (optional) python3-ujson
 
 Getting started
 ---------------
+
 * Refer to the supybot documentation to install supybot and configure
   your server e. g., using supybot-wizard. Verify that you can start and
   contact your bot.
@@ -133,6 +143,7 @@ These settings can be manipulated using `sectiondata` as explained in Getting St
 
 Input line format
 -----------------
+
 Each line read from the input port should have the following format:
 
     <name>;<password>;<any text>
@@ -148,9 +159,9 @@ Each line read from the input port should have the following format:
 Unparsable lines are logged but otherwise silently dropped. Blacklisted
 clients are not even logged.
 
-
 Command List
 ------------
+
 Plugin commands:
 
 * `sectiondata`: Takes a section name, a password and a comma-separated
@@ -182,6 +193,7 @@ Scripts:
 
 Security
 --------
+
 Irc servers are normally not Fort Knox, so this is not the place for ssl or
 2-factor authentication. That said, leaving a TCP port open as a relay to
 irc channel(s) certainly requires some precaution. The steps here are:
@@ -191,7 +203,6 @@ irc channel(s) certainly requires some precaution. The steps here are:
 - Password cleartext is not saved anywhere.
 - Clients which repeatedly fails to send correct data are blacklisted for a
   while.
-
 
 Static checking and unit tests.
 -------------------------------
@@ -208,4 +219,3 @@ Unit tests:
 ```
   $ supybot-test plugins/Irccat
 ```
-

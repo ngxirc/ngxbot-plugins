@@ -47,10 +47,13 @@ to print from io_process.
 
 import crypt
 import multiprocessing
-import pickle
 import random
 import sys
 import time
+try:
+    import ujson as json
+except ImportError:
+    import json
 
 from twisted.internet import reactor, protocol
 from twisted.protocols import basic
@@ -137,13 +140,14 @@ class _Config(object):
         self.privmsg = config.global_option('privmsg').value
         self._path = config.global_option('sectionspath').value
         try:
-            self._data = pickle.load(open(self._path, 'rb'))
+            self._data = json.load(open(self._path, 'rb'))
         except IOError:
             self._data = {}
             logger = log.getPluginLogger('irccat.config')
             logger.warning("Can't find stored config, creating empty.")
             self._dump()
         except Exception:   # Unpickle throws just anything.
+            # TODO: This is left over from pickle usage
             self._data = {}
             logger = log.getPluginLogger('irccat.config')
             logger.warning("Bad stored config, creating empty.")
@@ -151,7 +155,7 @@ class _Config(object):
 
     def _dump(self):
         ''' Update persistent data.'''
-        pickle.dump(self._data, open(self._path, 'wb'))
+        json.dump(self._data, open(self._path, 'wb'))
 
     def get(self, section_name):
         ''' Return (password, channels) tuple or raise KeyError. '''

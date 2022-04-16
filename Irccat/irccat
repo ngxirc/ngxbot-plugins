@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
-usage = """
+usage = '''
 Usage: irccat [-s] <host> <port> <section> <text...>
 
 host:    supybot host running irccat plugin.
-port     The port irccat plugin listen to.
+port:    The port irccat plugin listen to.
 section: A section defined using the sectiondata command on the
          subybot host.
 text...  Sent verbatim to subybot, which is assumed to forward it
@@ -16,7 +16,7 @@ Options:
 Environment:
          IRCCAT_PASSWORD: If not using -s, irccat expects this to hold the
          required password.
-"""
+'''
 
 import os
 import sys
@@ -24,15 +24,15 @@ import socket
 
 
 def error(why):
-    print "Error: " + why
-    print "Use -h for help"
+    print('Error: {}'.format(why))
+    print('Use -h for help')
     sys.exit(1)
 
 
 sys.argv.pop(0)
 try:
     if sys.argv[0] == '-h' or sys.argv[0] == '--help':
-        print usage
+        print(usage)
         sys.exit(0)
     elif sys.argv[0] == '-s':
         sys.argv.pop(0)
@@ -40,26 +40,18 @@ try:
     elif 'IRCCAT_PASSWORD' in os.environ:
         pw = os.environ['IRCCAT_PASSWORD']
     else:
-        error("neither -s nor IRCCAT_PASSWORD present.")
+        error('neither -s nor IRCCAT_PASSWORD present.')
     host = sys.argv.pop(0)
     port = int(sys.argv.pop(0))
     section = sys.argv.pop(0)
 except ValueError:
-    error("illegal port number.")
+    error('illegal port number.')
 except IndexError:
-    error("too few arguments.")
+    error('too few arguments.')
 text = ' '.join(sys.argv)
 if not text:
-    error("too few arguments.")
+    error('too few arguments.')
 
 s = socket.create_connection((host, port))
-s.send('%s;%s;%s\n' % (section, pw, text))
+s.send('{};{};{}'.format(section, pw, text).encode())
 s.close()
-
-
-
-
-
-
-
-

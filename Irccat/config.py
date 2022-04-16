@@ -56,7 +56,7 @@ def global_option(option):
 Irccat = conf.registerPlugin('Irccat')
 
 conf.registerGlobalValue(Irccat, 'sectionspath',
-    registry.String('sections.pickle', 'Pickled section data'))
+    registry.String('sections.json', 'Section data'))
 
 conf.registerGlobalValue(Irccat, 'port',
     registry.NonNegativeInteger(12345,

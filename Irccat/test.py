@@ -50,9 +50,9 @@ from . import plugin as irccat
 CLIENT = os.path.join(os.path.dirname(__file__), 'irccat')
 
 def clear_sections(testcase):
-    if os.path.exists('test-sections.pickle'):
-        os.unlink('test-sections.pickle')
-    config.global_option('sectionspath').setValue('test-sections.pickle')
+    if os.path.exists('test-sections.json'):
+        os.unlink('test-sections.json')
+    config.global_option('sectionspath').setValue('test-sections.json')
     config.global_option('port').setValue(23456)
 
 def communicate(msg, sendonly):
