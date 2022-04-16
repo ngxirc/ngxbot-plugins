@@ -124,14 +124,6 @@ class _Blacklist(object):
         return False
 
 
-class _Section(object):
-    ''' Section representation in _Config._data. '''
-
-    def __init__(self, password, channels):
-        self.password = password
-        self.channels = channels
-
-
 class _Config(object):
     ''' Persistent stored section data. '''
 
@@ -155,16 +147,18 @@ class _Config(object):
 
     def _dump(self):
         ''' Update persistent data.'''
+        from pprint import pprint
+        pprint(self._data)
         json.dump(self._data, open(self._path, 'w'))
 
     def get(self, section_name):
         ''' Return (password, channels) tuple or raise KeyError. '''
         s = self._data[section_name]
-        return s.password, s.channels
+        return s['password'], s['channels']
 
     def update(self, section_name, password, channels):
         ''' Store section data for name, creating it if required. '''
-        self._data[section_name] = _Section(password, channels)
+        self._data[section_name] = {'password': password, 'channels': channels}
         self._dump()
 
     def remove(self, section_name):
