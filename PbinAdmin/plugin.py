@@ -91,7 +91,9 @@ class PbinAdmin(supybot.callbacks.Plugin):
         # Check capability
         if not supybot.world.testing:
             capability = supybot.ircdb.makeChannelCapability(channel, 'pbinadmin')
-            if not supybot.ircdb.checkCapability(msg.prefix, capability):
+            if not supybot.ircdb.checkCapability(
+                    msg.prefix, capability,
+                    ignoreDefaultAllow=True):
                 irc.errorNoCapability(capability, Raise=True)
 
         # Send API request
