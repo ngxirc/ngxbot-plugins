@@ -54,28 +54,28 @@ class PbinAdmin(supybot.callbacks.Plugin):
         self.__parent = super(PbinAdmin, self)
         self.__parent.__init__(irc)
 
-    @wrap([optional('channel'), 'text'])
+    @wrap([optional('channel'), 'somethingWithoutSpaces'])
     def whitelist(self, irc, msg, args, channel, address):
         '''[<channel>] <address>
 
         Add a registered subnet to whitelist for specified IP address.'''
         return self._cmd_wrapper(irc, msg, args, address, 'wl')
 
-    @wrap([optional('channel'), 'text'])
+    @wrap([optional('channel'), 'somethingWithoutSpaces'])
     def greylist(self, irc, msg, args, channel, paste_id):
         '''[<channel>] <paste_id>
 
         Add address for specified paste to grey list.'''
         return self._cmd_wrapper(irc, msg, args, paste_id, 'gl')
 
-    @wrap([optional('channel'), 'text'])
+    @wrap([optional('channel'), 'somethingWithoutSpaces'])
     def blacklist(self, irc, msg, args, channel, paste_id):
         '''[<channel>] <paste_id>
 
         Add address for specified paste to black list.'''
         return self._cmd_wrapper(irc, msg, args, paste_id, 'bl')
 
-    @wrap([optional('channel'), 'text'])
+    @wrap([optional('channel'), 'somethingWithoutSpaces'])
     def delete(self, irc, msg, args, channel, paste_id):
         '''[<channel>] <paste_id>
 
@@ -84,18 +84,12 @@ class PbinAdmin(supybot.callbacks.Plugin):
 
     def _cmd_wrapper(self, irc, msg, args, target, command):
         '''Send request to the API server after performing sanity checks.'''
-        # Sanity checks
+        # Pre-flight checks
         if not self.registryValue('enabled', msg.args[0]):
-            return None
-        if ' ' in target:
             return None
 
         # Check capability
-        if not supybot.ircdb.checkCapability(
-                msg.prefix, 'pbinadmin',
-                ignoreOwner=True,
-                ignoreChannelOp=True,
-                ignoreDefaultAllow=True):
+        if not supybot.ircdb.checkCapability(msg.prefix, 'pbinadmin'):
             if not supybot.world.testing:
                 irc.errorNoCapability('pbinadmin', Raise=True)
 
