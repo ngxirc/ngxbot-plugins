@@ -80,9 +80,9 @@ class PbinAdmin(supybot.callbacks.Plugin):
         '''[<channel>] <paste_id>
 
         Delete a paste with specified ID.'''
-        return self._cmd_wrapper(irc, msg, args, paste_id, channel, 'del')
+        return self._cmd_wrapper(irc, msg, args, channel, paste_id, 'del')
 
-    def _cmd_wrapper(self, irc, msg, args, target, command):
+    def _cmd_wrapper(self, irc, msg, args, channel, target, command):
         '''Send request to the API server after performing sanity checks.'''
         # Pre-flight checks
         if not self.registryValue('enabled', msg.args[0]):
@@ -91,7 +91,7 @@ class PbinAdmin(supybot.callbacks.Plugin):
         # Check capability
         if not supybot.world.testing:
             capability = supybot.ircdb.makeChannelCapability(channel, 'pbinadmin')
-            if not ircdb.checkCapability(msg.prefix, capability):
+            if not supybot.ircdb.checkCapability(msg.prefix, capability):
                 irc.errorNoCapability(capability, Raise=True)
 
         # Send API request
