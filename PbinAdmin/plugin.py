@@ -59,28 +59,28 @@ class PbinAdmin(supybot.callbacks.Plugin):
         '''[<channel>] <address>
 
         Add a registered subnet to whitelist for specified IP address.'''
-        return self._cmd_wrapper(irc, msg, args, address, 'wl')
+        return self._cmd_wrapper(irc, msg, args, channel, address, 'wl')
 
     @wrap([optional('channel'), 'somethingWithoutSpaces'])
     def greylist(self, irc, msg, args, channel, paste_id):
         '''[<channel>] <paste_id>
 
         Add address for specified paste to grey list.'''
-        return self._cmd_wrapper(irc, msg, args, paste_id, 'gl')
+        return self._cmd_wrapper(irc, msg, args, channel, paste_id, 'gl')
 
     @wrap([optional('channel'), 'somethingWithoutSpaces'])
     def blacklist(self, irc, msg, args, channel, paste_id):
         '''[<channel>] <paste_id>
 
         Add address for specified paste to black list.'''
-        return self._cmd_wrapper(irc, msg, args, paste_id, 'bl')
+        return self._cmd_wrapper(irc, msg, args, channel, paste_id, 'bl')
 
     @wrap([optional('channel'), 'somethingWithoutSpaces'])
     def delete(self, irc, msg, args, channel, paste_id):
         '''[<channel>] <paste_id>
 
         Delete a paste with specified ID.'''
-        return self._cmd_wrapper(irc, msg, args, paste_id, 'del')
+        return self._cmd_wrapper(irc, msg, args, paste_id, channel, 'del')
 
     def _cmd_wrapper(self, irc, msg, args, target, command):
         '''Send request to the API server after performing sanity checks.'''
@@ -89,9 +89,10 @@ class PbinAdmin(supybot.callbacks.Plugin):
             return None
 
         # Check capability
-        if not supybot.ircdb.checkCapability(msg.prefix, 'pbinadmin'):
-            if not supybot.world.testing:
-                irc.errorNoCapability('pbinadmin', Raise=True)
+        if not supybot.world.testing:
+            capability = supybot.ircdb.makeChannelCapability(channel, 'pbinadmin')
+            if not ircdb.checkCapability(msg.prefix, capability):
+                irc.errorNoCapability(capability, Raise=True)
 
         # Send API request
         resp = requests.post(
